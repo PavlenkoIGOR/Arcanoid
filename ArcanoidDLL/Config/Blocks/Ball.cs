@@ -28,7 +28,7 @@ namespace ArcanoidDLL.Config.Blocks
             this.direction = dir;
         }
 
-        public void Move(RenderWindow rw, Vector2f vec, List<BlockData> otherSprites)
+        public void Move(RenderWindow rw, Vector2f vec, List<BlockData> blocks)
         {
             // Если мяч не движется, устанавливаем его позицию в vec
             if (!isBallMoving)
@@ -42,7 +42,10 @@ namespace ArcanoidDLL.Config.Blocks
                 Console.WriteLine("Move");
                 Random random = new Random();
                 float rX = (float)(random.Next(-10, 10));
-                Start(100, new Vector2f(rX / 10, -1)); // Устанавливаем скорость и направление
+
+                Start(200, new Vector2f(rX / 10, -1)); // Устанавливаем скорость и направление
+
+
                 isBallMoving = true; // Мяч начинает движение
             }
 
@@ -78,48 +81,31 @@ namespace ArcanoidDLL.Config.Blocks
                 }
 
                 // Проверка коллизий с другими спрайтами
-                foreach (var otherSprite in otherSprites)
+                foreach (var block in blocks)
                 {
-                    if (sprite.GetGlobalBounds().Intersects(otherSprite.sprite.GetGlobalBounds()))
+
+                    if (sprite.Position.Y <= block.sprite.Position.Y + block.sprite.Texture.Size.Y) //проверка на столкновение по Y сверху
                     {
-                        // Получаем границы другого спрайта
-                        FloatRect otherBounds = otherSprite.sprite.GetGlobalBounds();
-                        Vector2f ballCenter = new Vector2f(
-                            sprite.Position.X + sprite.GetLocalBounds().Width / 2,
-                            sprite.Position.Y + sprite.GetLocalBounds().Height / 2);
+                        direction.Y = -Math.Abs(direction.Y);
+                        Console.WriteLine("Y столкновение снизу");
+                    }
 
-                        Vector2f closestPoint = new Vector2f(
-                            Math.Clamp(ballCenter.X, otherBounds.Left, otherBounds.Left + otherBounds.Width),
-                            Math.Clamp(ballCenter.Y, otherBounds.Top, otherBounds.Top + otherBounds.Height));
+                    //if (sprite.Position.Y + sprite.Texture.Size.Y >= block.sprite.Position.Y) //проверка на столкновение по Y сверху
+                    //{
+                    //    direction.Y = -Math.Abs(direction.Y);
+                    //    Console.WriteLine("Y столкновение сверху");
+                    //}
 
-                        Vector2f collisionVector = ballCenter - closestPoint;
-
-                        // Определяем, по какой оси произошло столкновение
-                        float absCollisionX = Math.Abs(collisionVector.X);
-                        float absCollisionY = Math.Abs(collisionVector.Y);
-
-                        if (absCollisionX > absCollisionY)
-                        {
-                            direction.X *= -1; // Меняем направление по X (горизонтальный отскок)
-                            // Избавляем мяч от повторного пересечения
-                            sprite.Position = new Vector2f(sprite.Position.X + (collisionVector.X > 0 ? absCollisionX : -absCollisionX), sprite.Position.Y);
-                        }
-                        else
-                        {
-                            direction.Y *= -1; // Меняем направление по Y (вертикальный отскок)
-                            // Избавляем мяч от повторного пересечения
-                            sprite.Position = new Vector2f(sprite.Position.X, sprite.Position.Y + (collisionVector.Y > 0 ? absCollisionY : -absCollisionY));
-                        }
-
-                        // Уменьшаем количество жизней у другого спрайта
-                        otherSprite.hitTimes--;
-                        if (otherSprite.hitTimes == 0 && otherSprite.isDestroyable)
+                    // Уменьшаем количество жизней у другого спрайта
+                    block.hitTimes--;
+                        if (block.hitTimes == 0 && block.isDestroyable)
                         {
                             // Логика уничтожения спрайта, если он разрушаем
                         }
-                    }
+                    
                 }
             }
         }
+
     }
 }
