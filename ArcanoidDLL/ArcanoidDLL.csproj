@@ -9,7 +9,9 @@
   <ItemGroup>
     <None Remove="GameResources\Ball.png" />
     <None Remove="GameResources\BlueBlock.png" />
+    <None Remove="GameResources\frame.png" />
     <None Remove="GameResources\HARRINGTON.TTF" />
+    <None Remove="GameResources\level1_3.png" />
     <None Remove="GameResources\Platform.png" />
     <None Remove="GameResources\RedBlock.png" />
     <None Remove="GameResources\YellowBlock.png" />
@@ -20,6 +22,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="GameResources\BlueBlock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameResources\frame.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameResources\level1_3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="GameResources\HARRINGTON.TTF">

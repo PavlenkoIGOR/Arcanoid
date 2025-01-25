@@ -7,14 +7,14 @@ using SFML.System;
 
 namespace ArcanoidDLL.Config;
 
-public class MainMenu : Screen//ILevel
+public class MainMenuScreen : Screen//ILevel
 {
     //private ArcanoidWindowData _awindowData;
-    private string[] _menuText = { "Start new game", "Load level", "Save level", "Options", "Exit"};
+    private string[] _menuText = { "Start new game", "Choose level", "Save level", "Options", "Exit"};
     
     private Text _versionText;
     private List<ButtonDTO> _buttons;
-    public MainMenu(RenderWindow rw, ScreenHandler lH) : base(rw, lH)
+    public MainMenuScreen(RenderWindow rw, ScreenHandler lH) : base(rw, lH)
     {
         status = 1;
         //_awindowData = awindowData;

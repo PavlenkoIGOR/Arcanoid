@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ArcanoidDLL.ArcanoidResources;
 using ArcanoidDLL.Config;
-using ArcanoidDLL.Services;
 using Arkanoid.Data;
 using SFML.Graphics;
 using SFML.System;
@@ -30,11 +29,7 @@ text.Position = new SFML.System.Vector2f(awindowData.windowWidth / 2, awindowDat
 Clock clock = new Clock();
 float timeDelay = 3.0f;
 
-GameLevel gLevel = new GameLevel(rw, levelHandler);
-MainMenu mainMenu = new MainMenu(rw, levelHandler);
 
-
-//ILevel level = mainMenu;
 while (rw.IsOpen)
 {
     // Обработка событий
@@ -43,7 +38,7 @@ while (rw.IsOpen)
     // Очистка окна
     rw.Clear();
 
-    foreach (var level in levelHandler.levels)
+    foreach (var level in levelHandler.screens)
     {
         if (level.status == 1)
             level.DrawLevel();

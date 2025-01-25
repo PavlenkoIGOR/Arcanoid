@@ -9,12 +9,13 @@ namespace ArcanoidDLL.Config
 {
     public class ScreenHandler
     {
-        public List<Screen> levels;
+        public List<Screen> screens;
         public ScreenHandler(RenderWindow rw)
         {
-            levels = new List<Screen>() {
-                new MainMenu(rw, this),
-                new GameLevel(rw, this),
+            screens = new List<Screen>() {
+                new MainMenuScreen(rw, this),
+                new GameLevelScreen(rw, this),
+                new ChooseLevelScreen(rw, this)
             };
         }
     }

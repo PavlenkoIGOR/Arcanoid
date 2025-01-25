@@ -64,10 +64,10 @@ namespace ArcanoidDLL.Config.Buttons
                     {
                         _window.Clear();
                         //Console.WriteLine("_bttnText == \"Start new game\"");
-                        foreach (var level in _levelHandler.levels)
+                        foreach (var level in _levelHandler.screens)
                         {
                             //Console.WriteLine($"{level.GetType().Name}");
-                            if (level.GetType().Name == "GameLevel") 
+                            if (level.GetType().Name == typeof(GameLevelScreen).Name) 
                             {
                                 Console.WriteLine($"{nameof(level)}");
                                 level.status = 1;
@@ -76,6 +76,34 @@ namespace ArcanoidDLL.Config.Buttons
                             {
                                 level.status = 0;
                             }
+                        }
+                    }
+                    if (_bttnText == "Choose level")
+                    {
+                        _window.Clear();
+                        Console.WriteLine("_bttnText == Choose level");
+                        foreach (var level in _levelHandler.screens)
+                        {
+                            Console.WriteLine($"type {typeof(ChooseLevelScreen).Name}");
+                            Console.WriteLine($"name {level.GetType().Name}");
+                            if (level.GetType().Name == typeof(ChooseLevelScreen).Name)
+                            {
+                                Console.WriteLine($"{level} asdasdasda");
+                                level.status = 1;
+                            }
+                            else
+                            {
+                                level.status = 0;
+                            }
+                        }
+                    }
+                    if (_bttnText == "Exit")
+                    {
+                        _window.Clear();
+                        //Console.WriteLine("_bttnText == \"Start new game\"");
+                        foreach (var level in _levelHandler.screens)
+                        {
+                            _window.Closed += (s, e) => _window.Close();
                         }
                     }
                 }

@@ -6,7 +6,6 @@ namespace ArcanoidDLL.Config.Blocks
 {
     internal class Ball : BlockData
     {
-        public Vector2f Velocity { get; set; }
         public float speed;
         public Vector2f direction = new Vector2f();
         private bool isBallMoving = false;
@@ -15,7 +14,6 @@ namespace ArcanoidDLL.Config.Blocks
         {
             this._texture = new Texture(Path.Combine(Environment.CurrentDirectory, "GameResources", "Ball.png"));
             this.sprite = new Sprite(_texture);
-            this.Velocity = new Vector2f(0, -300); // Начальная скорость (можно регулировать)
             this.sprite.Scale = new Vector2f(0.2f, 0.2f);
             // размер спрайта в оригинале до масштабирования 200px на 200px
         }
@@ -41,9 +39,9 @@ namespace ArcanoidDLL.Config.Blocks
             {
                 Console.WriteLine("Move");
                 Random random = new Random();
-                float rX = (float)(random.Next(-10, 10));
+                float rX = random.Next(-10, 10);
 
-                Start(200, new Vector2f(rX / 10, -1)); // Устанавливаем скорость и направление
+                Start(400, new Vector2f(rX / 10 + 0.1f, -1)); // Устанавливаем скорость и направление
 
 
                 isBallMoving = true; // Мяч начинает движение
@@ -52,60 +50,84 @@ namespace ArcanoidDLL.Config.Blocks
             // Перемещение шара
             if (isBallMoving)
             {
+                //Console.WriteLine($"sprite posX {sprite.Position.X} posY{sprite.Position.Y}");
                 sprite.Position += direction * speed * 0.016f; // Обновление позиции с учетом времени (при 60 FPS это примерно 0.016)
 
-                // Проверка коллизий с границами окна
-                if (sprite.Position.X < 0) // Левый край
+                if (sprite.Position.Y <= 0)
                 {
-                    sprite.Position = new Vector2f(0, sprite.Position.Y); // Возвращаем к границе
-                    direction.X = Math.Abs(direction.X); // Меняем направление на правое
+                    direction.Y *= -1;
                 }
-
-                if (sprite.Position.X + sprite.GetGlobalBounds().Width > rw.Size.X) // Правый край
+                if (sprite.Position.X <= 0 || sprite.Position.X + sprite.GetGlobalBounds().Width >= rw.Size.X)
                 {
-                    sprite.Position = new Vector2f(rw.Size.X - sprite.GetGlobalBounds().Width, sprite.Position.Y); // Возвращаем к границе
-                    direction.X = -Math.Abs(direction.X); // Меняем направление на левое
+                    direction.X *= -1;
                 }
-
-                if (sprite.Position.Y < 0) // Верхний край
+                if (sprite.Position.Y >= rw.Size.Y)
                 {
-                    sprite.Position = new Vector2f(sprite.Position.X, 0); // Возвращаем к границе
-                    direction.Y = Math.Abs(direction.Y); // Меняем направление на вниз
-                }
-
-                if (sprite.Position.Y + sprite.GetGlobalBounds().Height > rw.Size.Y) // Нижний край
-                {
+                    Console.WriteLine("out of bottom screen");
                     isBallMoving = false;
-                    sprite.Position = vec;
-                    direction.Y = -direction.Y;
+                    direction.Y *= -1;
+                    
                 }
+
+                /*
+                 
+                 */
 
                 // Проверка коллизий с другими спрайтами
                 foreach (var block in blocks)
                 {
-
-                    if (sprite.Position.Y <= block.sprite.Position.Y + block.sprite.Texture.Size.Y) //проверка на столкновение по Y сверху
-                    {
-                        direction.Y = -Math.Abs(direction.Y);
-                        Console.WriteLine("Y столкновение снизу");
-                    }
-
-                    //if (sprite.Position.Y + sprite.Texture.Size.Y >= block.sprite.Position.Y) //проверка на столкновение по Y сверху
-                    //{
-                    //    direction.Y = -Math.Abs(direction.Y);
-                    //    Console.WriteLine("Y столкновение сверху");
-                    //}
-
-                    // Уменьшаем количество жизней у другого спрайта
-                    block.hitTimes--;
-                        if (block.hitTimes == 0 && block.isDestroyable)
+                    var deltaPass = direction - block.sprite.Position;
+                    if (sprite.GetGlobalBounds().Intersects(block.sprite.GetGlobalBounds()) && block.hitTimes > 0 || sprite.GetGlobalBounds().Intersects(block.sprite.GetGlobalBounds()) && block.GetType() == typeof(Platform))
+                    {                                                                        
+                        if (block.GetType() == typeof(Platform))
                         {
-                            // Логика уничтожения спрайта, если он разрушаем
+                            direction.Y = -1;
+
                         }
-                    
+                        if (block.GetType() != typeof(Platform))
+                        {
+                            if (sprite.GetGlobalBounds().Top <= block.sprite.GetGlobalBounds().Top + block.sprite.GetGlobalBounds().Height) //снизу
+                            {
+                                if (direction.X > 0 && direction.Y < 0)
+                                {
+                                    direction.Y *= -1;
+                                    block.hitTimes--;
+                                    return;
+                                }
+                                if (direction.X > 0 && direction.Y < 0 || direction.X < 0 && direction.Y < 0)
+                                {
+                                    direction.Y *= -1;
+                                    block.hitTimes--;
+                                    return;
+                                }
+                            }
+                            if (sprite.GetGlobalBounds().Top  + sprite.GetGlobalBounds().Height >= block.sprite.GetGlobalBounds().Top) //сверху
+                            {
+                                if (direction.X > 0 && direction.Y > 0 || direction.X < 0 && direction.Y > 0)
+                                {
+                                    direction.Y *= -1; block.hitTimes--; return ;
+                                }
+                            }
+                            if (sprite.GetGlobalBounds().Left + sprite.GetGlobalBounds().Width >= block.sprite.GetGlobalBounds().Left) //справа
+                            {
+                                if (direction.X > 0 && direction.Y > 0 || direction.X > 0 && direction.Y < 0)
+                                {
+                                    direction.X *= -1; block.hitTimes--; return;
+                                }
+                            }
+                            if (sprite.GetGlobalBounds().Left <= block.sprite.GetGlobalBounds().Left + block.sprite.GetLocalBounds().Width)  //слева
+                            {
+                                if (direction.X < 0 && direction.Y > 0 || direction.X < 0 && direction.Y < 0)
+                                {
+                                    direction.X *= -1; block.hitTimes--; return;
+                                }
+                            }
+
+                            
+                        }
+                    }                    
                 }
             }
         }
-
     }
 }
