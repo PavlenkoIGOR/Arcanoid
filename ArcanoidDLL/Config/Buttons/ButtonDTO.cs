@@ -1,5 +1,4 @@
 ﻿using ArcanoidDLL.ArcanoidResources;
-using ArcanoidDLL.Services;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -22,26 +21,25 @@ namespace ArcanoidDLL.Config.Buttons
             _levelHandler = levelHandler;
             GameResources gr = new GameResources();
             _bttnText = bttnText;
-            _font = new Font(File.ReadAllBytes(gr.menuTextPath)); // Загружаем шрифт из пути
+            _font = new Font(File.ReadAllBytes(gr.menuTextPath));
 
             _window = window;
 
-            // Создание текстовой метки
             _text = new Text(bttnText, _font)
             {
                 FillColor = Color.Black,
                 Style = Text.Styles.Bold,
-                CharacterSize = 24 // Задайте размер шрифта
+                CharacterSize = 24
             };
 
-            // Чтобы текст был центрирован, нам необходимо установить позицию текста
+            // позиция текста
             SetTextPosition(x1y1, x2y2);
 
             // Создание кнопки
             _shape = new RectangleShape(x2y2)
             {
                 Position = x1y1,
-                FillColor = Color.Cyan // Установите цвет кнопки
+                FillColor = Color.Cyan
             };
         }
         public bool IsMouseOver(Vector2i mousePosition)
@@ -49,7 +47,6 @@ namespace ArcanoidDLL.Config.Buttons
             if (_shape.GetGlobalBounds().Contains(mousePosition.X, mousePosition.Y))
             {
                 //Console.WriteLine("над кнопкой {0}", _bttnText);
-                // Проверка и обработка нажатий мыши
                 if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
                     Vector2i mousePos = Mouse.GetPosition(_window);
@@ -63,48 +60,47 @@ namespace ArcanoidDLL.Config.Buttons
                     if (_bttnText == "Start new game")
                     {
                         _window.Clear();
+                        
+                        //Console.WriteLine("_bttnText == \"Start new game\"");
+                        foreach (var level in _levelHandler.screens)
+                        {
+                            level.status = 0;
+                        }
                         //Console.WriteLine("_bttnText == \"Start new game\"");
                         foreach (var level in _levelHandler.screens)
                         {
                             //Console.WriteLine($"{level.GetType().Name}");
-                            if (level.GetType().Name == typeof(GameLevelScreen).Name) 
+                            if (level.GetType().Name == typeof(GameLevelScreen).Name)
                             {
                                 Console.WriteLine($"{nameof(level)}");
                                 level.status = 1;
-                            }
-                            else
-                            {
-                                level.status = 0;
+                                (_levelHandler.screens[1] as GameLevelScreen).choosenLevel = 1;
                             }
                         }
                     }
                     if (_bttnText == "Choose level")
                     {
                         _window.Clear();
-                        Console.WriteLine("_bttnText == Choose level");
+                        
                         foreach (var level in _levelHandler.screens)
                         {
-                            Console.WriteLine($"type {typeof(ChooseLevelScreen).Name}");
-                            Console.WriteLine($"name {level.GetType().Name}");
+                            level.status = 0;
+                        }
+                        //Console.WriteLine("_bttnText == \"Start new game\"");
+                        foreach (var level in _levelHandler.screens)
+                        {
+                            //Console.WriteLine($"{level.GetType().Name}");
                             if (level.GetType().Name == typeof(ChooseLevelScreen).Name)
                             {
-                                Console.WriteLine($"{level} asdasdasda");
+                                Console.WriteLine($"{nameof(level)}");
                                 level.status = 1;
-                            }
-                            else
-                            {
-                                level.status = 0;
                             }
                         }
                     }
                     if (_bttnText == "Exit")
-                    {
-                        _window.Clear();
-                        //Console.WriteLine("_bttnText == \"Start new game\"");
-                        foreach (var level in _levelHandler.screens)
-                        {
-                            _window.Closed += (s, e) => _window.Close();
-                        }
+                    {                      
+                        _window.Close();
+                        Console.WriteLine("Window closed");
                     }
                 }
             }
@@ -121,7 +117,6 @@ namespace ArcanoidDLL.Config.Buttons
         }
         private void SetTextPosition(Vector2f position, Vector2f size)
         {
-            // Центрируем текст относительно кнопки
             _text.Position = new Vector2f(
                 position.X + (size.X - _text.GetGlobalBounds().Width) / 2,
                 position.Y + (size.Y - _text.GetGlobalBounds().Height) / 2

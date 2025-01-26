@@ -9,6 +9,7 @@ namespace ArcanoidDLL.Config.Blocks
         public float speed;
         public Vector2f direction = new Vector2f();
         private bool isBallMoving = false;
+        internal byte lifes = 3;
 
         public Ball()
         {
@@ -66,9 +67,10 @@ namespace ArcanoidDLL.Config.Blocks
                     Console.WriteLine("out of bottom screen");
                     isBallMoving = false;
                     direction.Y *= -1;
-                    
+                    lifes--;
+                    Console.WriteLine($"lifes Ball { lifes }");
                 }
-
+                
                 /*
                  
                  */

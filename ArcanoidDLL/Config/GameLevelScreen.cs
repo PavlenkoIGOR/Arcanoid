@@ -14,13 +14,14 @@ public class GameLevelScreen : Screen
     private const int TileSpacing = 10;
 
     private Text _lifesRemain;
-    private byte _lifes= 3;
+    private byte _lifes;
 
     private List<BlockData> spritesInLevel;
 
-    internal byte choosenLevel;
+    public byte choosenLevel;
+    private bool isConstruct = false;
 
-
+    GameResources gr;
     private int[,] level_1 =
     {
         { 1, 1, 1, 1, 1, 1 },
@@ -61,36 +62,57 @@ public class GameLevelScreen : Screen
 
 
         // Создание текста "Version"
-        GameResources gr = new GameResources();
-        _lifesRemain = new Text($"x{_lifes}", new Font(gr.menuTextPath))
+        gr = new GameResources();
+        
+        _lifesRemain = new Text()
         {
             Position = new Vector2f(10, 10), // Позиция в левом верхнем углу
             FillColor = Color.White, // Цвет текста
-            CharacterSize = 18 // Размер шрифта
+            CharacterSize = 24 // Размер шрифта            
         };
-
-        //ConstuctLevel();
+        _lifesRemain.Font = new Font(gr.menuTextPath);
     }
 
     public override void DrawLevel()
-    {  
+    {
+        if (isConstruct == false)
+        {
             ConstructLevel();
+            isConstruct = true;
+        }
 
         _rw.SetMouseCursorVisible(false);
 
-        foreach (var item in spritesInLevel)
+        if (ball.lifes != 0)
         {
-            if (item.hitTimes > 0 || item.GetType() == typeof(Platform))
+            foreach (var item in spritesInLevel)
             {
-                _rw.Draw(item.sprite);
+                if (item.hitTimes > 0 || item.GetType() == typeof(Platform))
+                {
+                    _rw.Draw(item.sprite);
+                    
+                }
+
+                
+            }
+
+            Vector2i mousePos = Mouse.GetPosition(_rw);
+            platform.UpdatePosition(new Vector2f(mousePos.X, mousePos.Y), _rw.Size.X);
+            ball.Move(_rw, platform.sprite.Position, spritesInLevel);
+            _lifesRemain.DisplayedString = $"x{ball.lifes}";
+            _rw.Draw(ball.sprite); // Рисуем шарик            
+
+            if (spritesInLevel.Where(h => h.hitTimes == 0).Count() == spritesInLevel.Count())
+            {
+                //Console.WriteLine("spritesInLevel.Where(h => h.hitTimes == 0).Count() == spritesInLevel.Count()");
+                isConstruct = false;
+                choosenLevel++;
             }
         }
-
-        Vector2i mousePos = Mouse.GetPosition(_rw);
-        platform.UpdatePosition(new Vector2f(mousePos.X, mousePos.Y), _rw.Size.X);
-        ball.Move(_rw, platform.sprite.Position, spritesInLevel);
-        
-        _rw.Draw(ball.sprite); // Рисуем шарик
+        if (ball.lifes == 0)
+        {
+            _lifesRemain.DisplayedString = "Game over!";
+        }
         _rw.Draw(_lifesRemain);
     }
     private void ConstructLevel()
