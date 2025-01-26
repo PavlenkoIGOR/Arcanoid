@@ -32,10 +32,11 @@ namespace ArcanoidDLL.Config
             _texture = new Texture(Path.Combine(Environment.CurrentDirectory, "GameResources", "level1_3.png"));
             _textureFrame = new Texture(Path.Combine(Environment.CurrentDirectory, "GameResources", "frame.png"));
 
-            GameResources gr = new GameResources();
-            _font = new Font(File.ReadAllBytes(gr.menuTextPath));
+            _resources = new GameResources();
+            _font = new Font(_resources.menuTextPath);
+            //_font = new Font(File.ReadAllBytes(_resources.menuTextPath));
             _text = new Text();
-
+            _text.Font = _font;
 
             _sprite1 = new Sprite(_texture) { TextureRect = new IntRect(0, 0, 300, 225) };
             _sprite2 = new Sprite(_texture) { TextureRect = new IntRect(301, 0, 300, 225) };
@@ -59,7 +60,7 @@ namespace ArcanoidDLL.Config
             Vector2f mouseWorldPosition = _rw.MapPixelToCoords(mousePosition);
 
             byte choosenLevel = 0;
- 
+
             // попадает ли мышь на какой-либо спрайт
             if (_sprite1.GetGlobalBounds().Contains(mouseWorldPosition.X, mouseWorldPosition.Y))
             {
@@ -125,11 +126,18 @@ namespace ArcanoidDLL.Config
                 }
             }
 
-            _text.Font = _font;
-            _text.FillColor = Color.White;
-            _text.CharacterSize = 40;
-                // позицию текста под рамкой
-            _text.Position = new Vector2f(startX + (totalWidth - _text.GetGlobalBounds().Width) / 2, _spriteFrame.Position.Y + _spriteFrame.GetGlobalBounds().Height + 10); 
+            
+            _text.Style = Text.Styles.Bold;
+            _text.FillColor = Color.Yellow;
+            _text.CharacterSize = 24;
+            _text.DisplayedString = "Press Enter";
+
+            // позиция текста под рамкой
+            _text.Position = new Vector2f(
+    _spriteFrame.Position.X + (_spriteFrame.GetGlobalBounds().Width - _text.GetGlobalBounds().Width) / 2,
+    _spriteFrame.Position.Y + _spriteFrame.GetGlobalBounds().Height + 10
+);
+            Console.WriteLine($"text pos {_text.Position}");
 
             _rw.Draw(_sprite1);
             _rw.Draw(_sprite2);
